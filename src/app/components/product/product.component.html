@@ -1,0 +1,88 @@
+<div class="container">
+  <h2>Gerenciar Produtos</h2>
+
+  <div *ngIf="message" 
+       [class]="'alert ' + (messageType === 'success' ? 'alert-success' : 'alert-error')">
+    {{ message }}
+  </div>
+
+  <div class="card">
+    <h3>Adicionar Novo Produto</h3>
+    <form (ngSubmit)="createProduct()" class="form">
+      <div class="form-group">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" [(ngModel)]="newProduct.name" name="nome" required>
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" [(ngModel)]="newProduct.description" name="descricao"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="saldo">Saldo:</label>
+        <input type="number" id="saldo" [(ngModel)]="newProduct.stock" name="saldo" min="0" required>
+      </div>
+
+      <div class="form-group">
+        <label for="preco">Preço:</label>
+        <input type="number" id="preco" [(ngModel)]="newProduct.price" name="preco" min="0" step="0.01" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Criar Produto</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Produtos Cadastrados</h3>
+    <div *ngIf="products.length === 0" class="no-data">
+      Nenhum produto cadastrado.
+    </div>
+
+    <div *ngFor="let produto of products" class="produto-item">
+      <div *ngIf="editingProduct?.id !== produto.id" class="produto-info">
+        <div class="produto-header">
+          <h4>{{ produto.name }}</h4>
+          <div class="produto-actions">
+            <button (click)="editProduct(produto)" class="btn btn-secondary">Editar</button>
+            <button (click)="deleteProduct(produto.id)" class="btn btn-danger">Deletar</button>
+          </div>
+        </div>
+        <p><strong>Descrição:</strong> {{ produto.description }}</p>
+        <p><strong>Saldo:</strong> {{ produto.stock }} unidades</p>
+        <p><strong>Preço:</strong> R$ {{ produto.price | number:'1.2-2' }}</p>
+        <p><strong>Criado em:</strong> {{ produto.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+
+      <div *ngIf="editingProduct?.id === produto.id" class="edit-form">
+        <h4>Editando: {{ produto.name }}</h4>
+        <form (ngSubmit)="saveEdit()" class="form">
+          <div class="form-group">
+            <label for="editNome">Nome:</label>
+            <input type="text" id="editNome" [(ngModel)]="editingProduct!.name" name="editNome" required>
+          </div>
+
+          <div class="form-group">
+            <label for="editDescricao">Descrição:</label>
+            <textarea id="editDescricao" [(ngModel)]="editingProduct!.description" name="editDescricao"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="editSaldo">Saldo:</label>
+            <input type="number" id="editSaldo" [(ngModel)]="editingProduct!.stock" name="editSaldo" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label for="editPreco">Preço:</label>
+            <input type="number" id="editPreco" [(ngModel)]="editingProduct!.price" name="editPreco" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" (click)="cancelEdit()" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
