@@ -1,0 +1,29 @@
+<div class="app-container">
+  <header class="app-header">
+    <h1>{{ title }}</h1>
+    <nav class="nav-tabs">
+      <button 
+        class="nav-tab" 
+        [class.active]="activeTab === 'products'"
+        (click)="setActiveTab('products')">
+        Produtos
+      </button>
+      <button 
+        class="nav-tab" 
+        [class.active]="activeTab === 'invoices'"
+        (click)="setActiveTab('invoices')">
+        Notas Fiscais
+      </button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <div *ngIf="activeTab === 'products'">
+      <app-product></app-product>
+    </div>
+    
+    <div *ngIf="activeTab === 'invoices'">
+      <app-invoice></app-invoice>
+    </div>
+  </main>
+</div>
