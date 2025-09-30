@@ -1,0 +1,113 @@
+<div class="container">
+  <h2>Gerenciar Notas Fiscais</h2>
+
+  <div *ngIf="message" 
+       [class]="'alert ' + (messageType === 'success' ? 'alert-success' : 'alert-error')">
+    {{ message }}
+  </div>
+
+  <div class="card">
+    <h3>Criar Nova Nota Fiscal</h3>
+    
+    <div class="add-item-form">
+      <h4>Adicionar Item</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="produto">Produto:</label>
+          <select id="produto" [(ngModel)]="newItem.productId" (change)="onProductSelected()" name="produto" required>
+            <option value="0">Selecione um produto</option>
+            <option *ngFor="let produto of products" [value]="produto.id">
+              {{ produto.name }} (Saldo: {{ produto.stock }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantidade">Quantidade:</label>
+          <input type="number" id="quantidade" [(ngModel)]="newItem.quantity" name="quantidade" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="preco">Preço Unitário:</label>
+          <input type="number" id="preco" [(ngModel)]="newItem.unitPrice" name="preco" min="0" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button type="button" (click)="addItem()" class="btn btn-secondary">Adicionar</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="newInvoice.items.length > 0" class="items-list">
+      <h4>Itens da Nota</h4>
+      <div class="item-header">
+        <span>Produto</span>
+        <span>Quantidade</span>
+        <span>Preço Unit.</span>
+        <span>Total</span>
+        <span>Ações</span>
+      </div>
+      
+      <div *ngFor="let item of newInvoice.items; let i = index" class="item-row">
+        <span>{{ getProductName(item.productId) }}</span>
+        <span>{{ item.quantity }}</span>
+        <span>R$ {{ item.unitPrice | number:'1.2-2' }}</span>
+        <span>R$ {{ calculateItemTotal(item) | number:'1.2-2' }}</span>
+        <button (click)="removeItem(i)" class="btn btn-danger btn-sm">Remover</button>
+      </div>
+
+      <div class="total-row">
+        <span><strong>Total da Nota:</strong></span>
+        <span><strong>R$ {{ calculateInvoiceTotal() | number:'1.2-2' }}</strong></span>
+      </div>
+
+      <div class="form-actions">
+        <button (click)="createInvoice()" class="btn btn-primary">Criar Nota Fiscal</button>
+        <button (click)="clearForm()" class="btn btn-secondary">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Notas Fiscais</h3>
+    <div *ngIf="invoices.length === 0" class="no-data">
+      Nenhuma nota fiscal encontrada.
+    </div>
+
+    <div *ngFor="let nota of invoices" class="nota-item">
+      <div class="nota-header">
+        <div class="nota-info">
+          <h4>{{ nota.number }}</h4>
+          <span [class]="'status ' + getStatusClass(nota.status)">
+            {{ getStatusText(nota.status) }}
+          </span>
+        </div>
+        <div class="nota-actions">
+          <button *ngIf="nota.status === InvoiceStatus.Open" 
+                  (click)="processInvoice(nota)" 
+                  class="btn btn-success">
+            Processar
+          </button>
+        </div>
+      </div>
+
+      <div class="nota-details">
+        <p><strong>Data de Criação:</strong> {{ nota.creationDate | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="nota.processingDate"><strong>Data de Processamento:</strong> {{ nota.processingDate | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="nota.closingDate"><strong>Data de Fechamento:</strong> {{ nota.closingDate | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="nota.failureReason"><strong>Motivo da Falha:</strong> {{ nota.failureReason }}</p>
+        <p><strong>Valor Total:</strong> R$ {{ nota.totalValue | number:'1.2-2' }}</p>
+      </div>
+
+      <div class="itens-details">
+        <h5>Itens:</h5>
+        <div *ngFor="let item of nota.items" class="item-detail">
+          <span>{{ item.productName }}</span>
+          <span>{{ item.quantity }} x R$ {{ item.unitPrice | number:'1.2-2' }}</span>
+          <span><strong>R$ {{ item.totalValue | number:'1.2-2' }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
